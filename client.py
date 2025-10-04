@@ -135,9 +135,10 @@ def write():
             client.send(message.encode('ascii'))
 
 
+## RUNNABLE ##
+if __name__ == "__main__":
+    receive_thread = threading.Thread(target=receive)
+    receive_thread.start()
 
-receive_thread = threading.Thread(target=receive)
-receive_thread.start()
-
-write_thread = threading.Thread(target=write)
-write_thread.start()
+    write_thread = threading.Thread(target=write)
+    write_thread.start()

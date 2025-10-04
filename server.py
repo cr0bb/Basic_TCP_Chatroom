@@ -128,8 +128,17 @@ def handle_client(client):
                 if nicknames[clients.index(client)] == 'ADMIN':
                     client.send("Enter new password: ".encode('ascii'))
                     new_password = client.recv(1024).decode('ascii')[len(nicknames[clients.index(client)])+2:]
-                    changepw(new_password)
-                    client.send("Password change successful".encode('ascii'))
+                    with open('password.txt', 'r') as f:
+                        curr_password = f.read()
+                    if new_password == curr_password:
+                        client.send("Password cannot be old password".encode('ascii'))
+                        continue
+                    elif new_password == '':
+                        client.send("Password cannot be empty".encode('ascii'))
+                        continue
+                    else:
+                        changepw(new_password)
+                        client.send("Password change successful".encode('ascii'))
                 else:
                     client.send("Invalid permissions to use command".encode('ascii'))
             elif msg.decode('ascii').startswith('PWV'):
@@ -239,7 +248,7 @@ def receive():
                 continue
             else:
                 client.send('PASS'.encode('ascii'))
-                password = client.recv(1024).decode('ascii')
+                password = client.recv(1024).decode('ascii').strip()
 
             with open('password.txt', 'r') as f:
                 curr_password = f.read()
@@ -266,5 +275,8 @@ def receive():
         thread = threading.Thread(target=handle_client, args=(client,))
         thread.start()
 
-print("Server is listening...")
-receive()
+
+## RUNNABLE ##
+if __name__ == '__main__':
+    print("Server is listening...")
+    receive()
